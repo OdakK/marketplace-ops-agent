@@ -9,7 +9,7 @@
 {"id": "best-rated", "question": "Which contractor has the best average review rating among those with at least 5 reviews? Give the name and rating.", "reference_sql": "SELECT c.name, ROUND(AVG(r.rating), 2) AS avg_rating FROM reviews r JOIN contractors c ON c.id = r.contractor_id GROUP BY c.id HAVING COUNT(*) >= 5 ORDER BY avg_rating DESC LIMIT 1", "tolerance": 0.02}
 {"id": "low-ratings", "question": "How many reviews have a rating of 2 or less?", "reference_sql": "SELECT COUNT(*) AS low FROM reviews WHERE rating <= 2"}
 {"id": "inactive-contractors", "question": "How many contractors are inactive?", "reference_sql": "SELECT COUNT(*) AS inactive FROM contractors WHERE active = 0"}
-{"id": "last-30-days", "question": "How many leads were created in the last 30 days?", "reference_sql": "SELECT COUNT(*) AS n FROM leads WHERE created_on > date('2026-10-31', '-30 days')"}
+{"id": "last-30-days", "question": "How many leads were created in the last 30 days, today included?", "reference_sql": "SELECT COUNT(*) AS n FROM leads WHERE created_on > date('2026-10-31', '-30 days')"}
 {"id": "stale-assigned", "question": "How many leads are assigned to a contractor but have had no response yet?", "reference_sql": "SELECT COUNT(*) AS n FROM leads WHERE status = 'assigned' AND responded_on IS NULL"}
 {"id": "avg-quote-roofing", "question": "What is the average quote amount for roofing leads, in euros?", "reference_sql": "SELECT ROUND(AVG(quote_amount), 0) AS avg_quote FROM leads WHERE trade = 'roofing' AND quote_amount IS NOT NULL", "tolerance": 0.01}
 {"id": "lyon-lost", "question": "How many leads were lost in Lyon?", "reference_sql": "SELECT COUNT(*) AS n FROM leads WHERE city = 'Lyon' AND status = 'lost'"}
