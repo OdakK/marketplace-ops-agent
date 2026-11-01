@@ -11,7 +11,8 @@ from . import sql_guard
 DB_PATH = Path(os.environ.get("OPS_AGENT_DB", "data/marketplace.db"))
 
 
-def connect(path: Path = DB_PATH) -> sqlite3.Connection:
+def connect(path: Path | None = None) -> sqlite3.Connection:
+    path = path or DB_PATH  # resolved at call time, so tests and the MCP client can point elsewhere
     if not path.exists():
         raise FileNotFoundError(f"{path} not found: run `python -m ops_agent.seed` first")
     # mode=ro + query_only: the second layer of defence, independent from the SQL validator.
