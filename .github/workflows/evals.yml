@@ -1,0 +1,31 @@
+name: Evals
+
+# Runs the evaluation suite against a real model. Manual only, because it costs API calls.
+# Needs the ANTHROPIC_API_KEY repository secret.
+on:
+  workflow_dispatch:
+    inputs:
+      judge:
+        description: "Also grade answers with an LLM judge"
+        type: boolean
+        default: true
+
+jobs:
+  evals:
+    runs-on: ubuntu-latest
+    env:
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.12"
+      - run: uv sync --extra anthropic
+      - run: uv run python -m ops_agent.seed
+      - name: Run evals (fails below the accuracy or security threshold)
+        run: uv run python -m evals.run ${{ inputs.judge && '--judge' || '' }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: eval-report
+          path: evals/results/
